@@ -24,44 +24,55 @@ export default class ActiveEffectMacros {
     ActiveEffect.prototype.executeMacro = function (...args) {
       if (!this.hasMacro()) return;
 
-      // const item = this;
       const activeEffect = this;
-      // const macro = item.getMacro();
       const macro = activeEffect.getMacro();
       const parent = activeEffect.parent;
 
-      // const speaker = ChatMessage.getSpeaker({ actor: item.actor });
-      // const actor = item.actor ?? game.actors.get(speaker.actor);
-      // const token = item.actor?.token ?? canvas.tokens.get(speaker.token);
+      const speaker = ChatMessage.getSpeaker();
+      const item = parent instanceof Item ? parent : null;
+      const actor =
+        (parent instanceof Actor
+          ? parent
+          : parent instanceof Item
+          ? item.actor
+          : game.actors.get(speaker.actor)) ?? null;
+      const token =
+        actor?.token ??
+        item?.actor?.token ??
+        canvas.tokens.get(speaker.token) ??
+        null;
       const character = game.user.character;
       const event = getEvent();
 
-      //build script execution
       const body = `(async ()=>{
         ${macro.data.command}
       })();`;
-      // const fn = Function(
-      //   'item',
-      //   'speaker',
-      //   'actor',
-      //   'token',
-      //   'character',
-      //   'event',
-      //   'args',
-      //   body
-      // );
       const fn = Function(
         'activeEffect',
         'parent',
+        'speaker',
+        'item',
+        'actor',
+        'token',
         'character',
         'event',
         'args',
         body
       );
 
-      //attempt script execution
       try {
-        fn.call(macro, activeEffect, parent, character, event, args);
+        fn.call(
+          macro,
+          activeEffect,
+          parent,
+          speaker,
+          item,
+          actor,
+          token,
+          character,
+          event,
+          args
+        );
       } catch (err) {
         ui.notifications.error('Error executing macro');
       }
