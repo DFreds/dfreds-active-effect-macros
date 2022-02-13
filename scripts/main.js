@@ -74,15 +74,16 @@ Hooks.on('preUpdateActiveEffect', (activeEffect, data, options, userId) => {
 });
 
 Hooks.on('createActiveEffect', (activeEffect, data, userId) => {
-  if (activeEffect?.hasMacro()) {
-    activeEffect.executeMacro('on');
-  }
+  if (!activeEffect?.hasMacro()) return;
+
+  activeEffect.executeMacro('on');
 });
 
 Hooks.on('deleteActiveEffect', (activeEffect, data, userId) => {
-  if (activeEffect?.hasMacro() && activeEffect?.data?.disabled === false) {
-    activeEffect.executeMacro('off');
-  }
+  if (!activeEffect?.hasMacro() || activeEffect?.data?.disabled === true)
+    return;
+
+  activeEffect.executeMacro('off');
 });
 
 Hooks.on('updateActiveEffect', (activeEffect, data, options, userId) => {
