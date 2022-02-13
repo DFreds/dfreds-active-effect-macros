@@ -1,8 +1,15 @@
+import ActiveEffectMacros from './active-effect-macros.js';
+
 Hooks.once('init', () => {
   // new Settings().registerSettings();
   // new HandlebarHelpers().registerHelpers();
 
   game.dfreds = game.dfreds || {};
+});
+
+Hooks.once('ready', () => {
+  const activeEffectMacros = new ActiveEffectMacros();
+  activeEffectMacros.registerFunctions();
 });
 
 Hooks.on('renderActiveEffectConfig', (activeEffectConfig, html, data) => {
@@ -11,6 +18,7 @@ Hooks.on('renderActiveEffectConfig', (activeEffectConfig, html, data) => {
     '<a class="item" data-tab="macro"><i class="fas fa-code"></i> Macro</a>'
   );
 
+  // TODO extract to template
   const effectsTab = html.find('section[data-tab="effects"]');
   effectsTab.after(
     `
